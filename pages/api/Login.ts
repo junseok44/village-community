@@ -4,7 +4,8 @@ import Iron from "@hapi/iron";
 import User from "../../model/UserSchema";
 import { setCookie } from "@/lib/auth-cookies";
 
-const tokenPassword = "junseok1234andthisisreallyinterestingsdfssdfsdfsdfs";
+const localTokenPassword = "123456356456425723457457247DSFASFASDFA245724724724";
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -23,8 +24,14 @@ export default async function handler(
       res.status(400).send({ message: "password not correct" });
       return;
     }
+    console.log(currentUser);
 
-    const token = await Iron.seal({ username }, tokenPassword, Iron.defaults);
+    // TODO findCookie
+    const token = await Iron.seal(
+      { username },
+      process.env.IRON_PASSWORD || localTokenPassword,
+      Iron.defaults
+    );
     setCookie(res, token);
     res.status(200).send("logined");
   } catch (e) {

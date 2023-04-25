@@ -1,5 +1,7 @@
-import { NextApiResponse } from "next";
 import { serialize } from "cookie";
+import Iron from "@hapi/iron";
+import { NextApiRequest, NextApiResponse } from "next";
+import Cookies from "cookies";
 
 const MAX_AGE = 60 * 60 * 8;
 
@@ -16,4 +18,22 @@ export const setCookie = (res: NextApiResponse, value: string) => {
   const myCookie = serialize("username", value, cookieOptions);
 
   res.setHeader("Set-Cookie", myCookie);
+};
+
+export const getDataFromCookie = async <T>(
+  req: NextApiRequest,
+  res: NextApiResponse,
+  name: string
+) => {
+  const cookies = new Cookies(req, res);
+  const data = cookies.get(name);
+  if (!data) throw Error("no user");
+  const cookieData: T = await Iron.unseal(
+    data,
+    process.env.IRON_PASSWORD || "",
+    Iron.defaults
+  );
+  return cookieData;
+  //get user from cookie.
+  // 어디까지 확장할것인가?
 };

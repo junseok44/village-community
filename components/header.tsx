@@ -1,8 +1,11 @@
+import { useUser } from "@/hooks/useUser";
+import { getDataFromCookie } from "@/lib/auth-cookies";
+import { NextApiRequest, NextApiResponse } from "next";
 import Link from "next/link";
 import { useState } from "react";
 
 const Header = () => {
-  const [user, setUser] = useState(null);
+  const { data, error, isLoading } = useUser();
   return (
     <header>
       <nav>
@@ -12,15 +15,18 @@ const Header = () => {
               <a>Home</a>
             </Link>
           </li>
-          {user ? (
+
+          {!isLoading && !error && data.username ? (
             <>
               <li>
                 <Link href="/profile" legacyBehavior>
-                  <a>Profile</a>
+                  <a>{data.username}'s Profile</a>
                 </Link>
               </li>
               <li>
-                <a href="/api/logout">Logout</a>
+                <a href="/api/user/logout" target="_self">
+                  Logout
+                </a>
               </li>
             </>
           ) : (

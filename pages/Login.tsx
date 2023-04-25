@@ -21,7 +21,7 @@ const Login = () => {
         }),
       });
       if (response.status == 200) {
-        // Router.push("/");
+        Router.push("/");
       } else {
         console.log(response.status);
         if (response.status === 400) {
