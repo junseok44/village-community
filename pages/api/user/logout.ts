@@ -1,12 +1,13 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { serialize } from "cookie";
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   console.log("logout");
 
-  const token = serialize("username", "", {
+  const token = serialize("user", "", {
     maxAge: -1,
     expires: new Date(Date.now() - 1),
     path: "/",

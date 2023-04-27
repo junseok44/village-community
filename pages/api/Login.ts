@@ -16,7 +16,7 @@ export default async function handler(
     const currentUser = await User.findOne({ username });
 
     if (!currentUser) {
-      res.status(400).send({ message: "no currentUser" });
+      res.status(400).send({ message: "no username" });
       return;
     }
 
@@ -24,15 +24,15 @@ export default async function handler(
       res.status(400).send({ message: "password not correct" });
       return;
     }
-    console.log(currentUser);
 
-    // TODO findCookie
-    const token = await Iron.seal(
-      { username },
+    const userToken = await Iron.seal(
+      { username: currentUser.username, id: currentUser.id },
       process.env.IRON_PASSWORD || localTokenPassword,
       Iron.defaults
     );
-    setCookie(res, token);
+
+    setCookie(res, "user", userToken);
+
     res.status(200).send("logined");
   } catch (e) {
     console.log(e);

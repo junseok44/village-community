@@ -1,8 +1,6 @@
 // lib/db/dbConnect.ts
 import mongoose from "mongoose";
 
-console.log(`${process.env.DB_URL}${process.env.DB_NAME}`);
-
 const DB_URI = `${process.env.DB_URL}${process.env.DB_NAME}`;
 
 let cached = global.mongoose;

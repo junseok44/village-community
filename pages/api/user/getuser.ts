@@ -6,18 +6,19 @@ export default async function handler(
   res: NextApiResponse
 ) {
   try {
-    const { username } = await getDataFromCookie<{ username: string }>(
-      req,
-      res,
-      "username"
-    );
-    if (username) {
-      res.send({ username: username });
+    const user = await getDataFromCookie<{
+      username: string;
+      id: string;
+    }>(req, res, "user");
+
+    if (user) {
+      res.send({ user });
     } else {
       throw new Error("no user");
     }
   } catch (e) {
-    console.log(e);
+    console.log("no user");
+
     res.status(404).send("no user");
   }
 }

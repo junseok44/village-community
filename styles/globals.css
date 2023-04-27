@@ -126,6 +126,10 @@ table {
   border-spacing: 0;
 }
 
+.__next {
+  position: relative;
+}
+
 /* 
 :root {
   --foreground-rgb: 0, 0, 0;
