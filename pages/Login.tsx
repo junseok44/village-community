@@ -1,6 +1,7 @@
 import Form from "@/components/form";
 import Router from "next/router";
 import React, { useState } from "react";
+import CenterLayout from "../components/shared/CenterLayout";
 
 const Login = () => {
   const [errorMsg, setErrorMsg] = useState("");
@@ -37,13 +38,15 @@ const Login = () => {
 
   return (
     <>
-      <div className="login">
+      {/* <div className="login"> */}
+      <CenterLayout>
         <Form isLogin={true} errorMsg={errorMsg} onSubmit={handleSubmit} />
-      </div>
+      </CenterLayout>
+      {/* </div> */}
       <style jsx>{`
         .login {
           max-width: 21rem;
-          margin: 4rem auto;
+          margin: 0 auto;
           padding: 1rem;
           border: 1px solid #ccc;
           border-radius: 4px;

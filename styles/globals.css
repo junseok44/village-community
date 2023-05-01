@@ -126,8 +126,16 @@ table {
   border-spacing: 0;
 }
 
-.__next {
+#__next {
   position: relative;
+}
+
+.my-post-style strong {
+  font-weight: bold;
+}
+
+.my-post-style em {
+  font-style: italic;
 }
 
 /* 

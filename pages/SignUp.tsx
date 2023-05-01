@@ -1,7 +1,7 @@
 import Form from "@/components/form";
 import Router from "next/router";
 import React, { useState } from "react";
-
+import CenterLayout from "../components/shared/CenterLayout";
 const SignUp = () => {
   const [errMsg, setErrorMsg] = useState("");
   const handleSubmit = async (e: React.FormEvent<any>) => {
@@ -36,18 +36,9 @@ const SignUp = () => {
 
   return (
     <>
-      <div className="login">
+      <CenterLayout>
         <Form isLogin={false} onSubmit={handleSubmit} errorMsg={errMsg} />
-      </div>
-      <style jsx>{`
-        .login {
-          max-width: 21rem;
-          margin: 4rem auto;
-          padding: 1rem;
-          border: 1px solid #ccc;
-          border-radius: 4px;
-        }
-      `}</style>
+      </CenterLayout>
     </>
   );
 };

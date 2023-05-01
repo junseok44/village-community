@@ -6,6 +6,12 @@ import { setCookie } from "@/lib/auth-cookies";
 
 const localTokenPassword = "123456356456425723457457247DSFASFASDFA245724724724";
 
+export interface UserToken {
+  username: string;
+  id: string;
+  villageId: string;
+}
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -26,7 +32,11 @@ export default async function handler(
     }
 
     const userToken = await Iron.seal(
-      { username: currentUser.username, id: currentUser.id },
+      {
+        username: currentUser.username,
+        id: currentUser._id,
+        villageId: currentUser.villageId,
+      },
       process.env.IRON_PASSWORD || localTokenPassword,
       Iron.defaults
     );

@@ -1,5 +1,14 @@
 import User from "@/model/UserSchema";
+import { debounce } from "lodash";
 import dbConnect from "./db";
+import {
+  GetServerSidePropsContext,
+  NextApiRequest,
+  NextApiResponse,
+} from "next";
+import { getDataFromCookie } from "./auth-cookies";
+import { UserToken } from "@/pages/api/Login";
+import mongoose from "mongoose";
 
 export const createUser = async ({
   username,
@@ -13,6 +22,7 @@ export const createUser = async ({
     const user = new User({
       username,
       password,
+      villageId: new mongoose.Types.ObjectId(),
     });
     await user.hashPassword(user.password);
     await user.save();
@@ -24,12 +34,26 @@ export const createUser = async ({
   }
 };
 
+// find user from db.
 export const findUser = async (username: string) => {
   try {
-    return await User.findOne({ username });
+    const user = await User.findOne({ username });
+    return user;
   } catch (e) {
-    console.log(e);
+    throw new Error("find user error occured");
   }
 };
 
+// delete user from db.
 export const deleteUser = async () => {};
+
+// check user from cookie.
+export const checkUser = async ({ req, res }: GetServerSidePropsContext) => {
+  try {
+    const user = await getDataFromCookie(req, res, "user");
+
+    return user;
+  } catch (e: any) {
+    return null;
+  }
+};

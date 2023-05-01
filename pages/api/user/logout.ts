@@ -6,7 +6,6 @@ export default async function handler(
   res: NextApiResponse
 ) {
   console.log("logout");
-
   const token = serialize("user", "", {
     maxAge: -1,
     expires: new Date(Date.now() - 1),

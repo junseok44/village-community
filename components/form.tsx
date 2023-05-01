@@ -11,44 +11,50 @@ const Form = ({
   onSubmit: (e: React.FormEvent) => void;
 }) => {
   return (
-    <form onSubmit={onSubmit}>
-      {errorMsg && <div style={{ color: "red" }}>{errorMsg}</div>}
-      <label>
-        <span>Username</span>
-        <input type="text" name="username" />
-      </label>
-      <label>
-        <span>Password</span>
-        <input type="password" name="password" required />
-      </label>
-      {!isLogin && (
+    <div className="login">
+      <form onSubmit={onSubmit}>
+        {errorMsg && <div style={{ color: "red" }}>{errorMsg}</div>}
         <label>
-          <span>Repeat password</span>
-          <input type="password" name="rpassword" required />
+          <span>Username</span>
+          <input type="text" name="username" />
         </label>
-      )}
-
-      <div className="submit">
-        {isLogin ? (
-          <>
-            <Link href="/SignUp" legacyBehavior>
-              <a>I don't have an account</a>
-            </Link>
-            <button type="submit">Login</button>
-          </>
-        ) : (
-          <>
-            <Link href="/Login" legacyBehavior>
-              <a>I already have an account</a>
-            </Link>
-            <button type="submit">Signup</button>
-          </>
+        <label>
+          <span>Password</span>
+          <input type="password" name="password" required />
+        </label>
+        {!isLogin && (
+          <label>
+            <span>Repeat password</span>
+            <input type="password" name="rpassword" required />
+          </label>
         )}
-      </div>
 
-      {/* {errorMessage && <p className="error">{errorMessage}</p>} */}
-
+        <div className="submit">
+          {isLogin ? (
+            <>
+              <Link href="/SignUp" legacyBehavior>
+                <a>I don't have an account</a>
+              </Link>
+              <button type="submit">Login</button>
+            </>
+          ) : (
+            <>
+              <Link href="/Login" legacyBehavior>
+                <a>I already have an account</a>
+              </Link>
+              <button type="submit">Signup</button>
+            </>
+          )}
+        </div>
+      </form>
       <style jsx>{`
+        .login {
+          max-width: 21rem;
+          margin: 0 auto;
+          padding: 1rem;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+        }
         form,
         label {
           display: flex;
@@ -87,7 +93,7 @@ const Form = ({
           margin: 1rem 0 0;
         }
       `}</style>
-    </form>
+    </div>
   );
 };
 

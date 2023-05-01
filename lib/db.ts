@@ -1,5 +1,6 @@
 // lib/db/dbConnect.ts
 import mongoose from "mongoose";
+import "../model/UserSchema";
 
 const DB_URI = `${process.env.DB_URL}${process.env.DB_NAME}`;
 

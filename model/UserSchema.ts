@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 
 const userSchema = new Schema({
   username: String,
+  villageId: Schema.Types.ObjectId,
   password: String,
 });
 

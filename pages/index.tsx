@@ -1,104 +1,138 @@
 import PostListHeader from "@/components/postlist_header";
 import PostList_Item from "@/components/postlist_item";
-import { getDataFromCookie } from "@/lib/auth-cookies";
+import { Button } from "@mui/material";
 import dbConnect from "@/lib/db";
 import Post from "../model/PostSchema";
-import { NextApiRequest, NextApiResponse } from "next";
+import { GetServerSideProps, NextApiRequest, NextApiResponse } from "next";
 import React from "react";
+import { UserToken } from "./api/Login";
+import { checkUser } from "@/lib/user";
+import Link from "next/link";
+import Header from "@/components/header";
+import Layout from "@/components/Layout";
+import { useRouter } from "next/router";
 
-interface UserProps {
-  username: string;
-  id: string;
-}
-
-interface PostProps {
+export interface TPost {
+  _id: string;
   title: string;
-  postNumber: string;
-  author: string;
+  postNumber: number;
+  body: string;
+  author: {
+    id: string;
+    username: string;
+  } | null;
   meta: {
     view: number;
     likes: number;
   };
   writeAt: Date;
+  category: string;
 }
 
-const Home = ({ user, posts }: { user: UserProps; posts: PostProps[] }) => {
+const Home = ({ posts, user }: { user: UserToken | null; posts: TPost[] }) => {
+  const router = useRouter();
+
+  const handleChangeCategory = (categoryName: string) => {
+    router.push({
+      pathname: router.pathname,
+      query: { category: categoryName },
+    });
+  };
+
   return (
-    <div className="Home">
-      {/* <h1 className="text-xl">hello {user.username}!!</h1> */}
-      <ul>
-        <PostListHeader></PostListHeader>
-        {posts &&
-          posts.map((post, index) => (
-            <PostList_Item
-              key={index}
-              author="삐리리리리불어봐유포니엄"
-              category="일반"
-              date="2025"
-              number={21215}
-              likes={23}
-              views={101}
-              title={post.title}
-            ></PostList_Item>
-          ))}
-        {/* {[1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18].map(
-          (item) => (
-            <PostList_Item
-              key={item}
-              author="삐리리리리불어봐유포니엄"
-              category="일반"
-              date="2025"
-              number={21215}
-              likes={23}
-              views={101}
-              title="Utilities for controlling how flex items both grow and shrink."
-            ></PostList_Item>
-          )
-        )} */}
-      </ul>
-      <style jsx>{`
-        .Home {
-          margin-top: 1rem;
-          ul {
-            width: 90%;
-            margin: 0 auto;
-            .postlist_item {
-              all: unset;
-              display: block;
-              padding: 0.7rem 0.5rem;
-              height: 1rem;
+    <>
+      <div className="Home">
+        <div className="controller flex justify-between items-center">
+          <ul className="category flex">
+            <li onClick={() => handleChangeCategory("")}>전체</li>
+            <li onClick={() => handleChangeCategory("일반")}>일반</li>
+            <li onClick={() => handleChangeCategory("정보글")}>정보글</li>
+            <li onClick={() => handleChangeCategory("이벤트")}>이벤트</li>
+          </ul>
+          <Button sx={{ whiteSpace: "nowrap" }}>
+            <Link href="/post/write">새 글 작성하기</Link>
+          </Button>
+        </div>
+        <ul className="postList">
+          <PostListHeader></PostListHeader>
+          {posts &&
+            posts.map((post, index) => (
+              <PostList_Item
+                key={index}
+                id={post._id}
+                author={post.author?.username ?? "no"}
+                category={post.category ?? "일반"}
+                date={post.writeAt}
+                number={post.postNumber}
+                likes={post.meta.likes}
+                views={post.meta.view}
+                title={post.title}
+              ></PostList_Item>
+            ))}
+        </ul>
+        <style jsx>{`
+          .Home {
+            margin-top: 1rem;
+            .controller {
+              .category {
+                li {
+                  padding: 0 0.5rem;
+                  cursor: pointer;
+                  position: relative;
+
+                  &:hover {
+                    opacity: 0.7;
+                    &::after {
+                      content: "";
+                      position: absolute;
+                      bottom: -5px;
+                      left: 50%;
+                      transform: translate(-50%);
+                      width: calc(100% - 1rem);
+                      height: 1px;
+                      background: black;
+                    }
+                  }
+                }
+              }
+            }
+            .postList {
+              margin: 0 auto;
+              .postlist_item {
+                all: unset;
+                display: block;
+                padding: 0.7rem 0.5rem;
+                height: 1rem;
+              }
             }
           }
-        }
-      `}</style>
-    </div>
+        `}</style>
+      </div>
+    </>
   );
 };
 
-export async function getServerSideProps({
-  req,
-  res,
-}: {
-  req: NextApiRequest;
-  res: NextApiResponse;
-}) {
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
   try {
-    const { username, id } = await getDataFromCookie<UserProps>(
-      req,
-      res,
-      "user"
-    );
-
     await dbConnect();
-    const posts = await Post.find({});
+    const posts = await Post.find({
+      ...(ctx.query.category && { category: ctx.query.category }),
+    })
+      .populate("author")
+      .sort([["writeAt", -1]])
+      .exec();
+
+    const user = await checkUser(ctx);
 
     return {
       props: {
-        user: { username, id },
+        user: user,
         posts: JSON.parse(JSON.stringify(posts)),
       },
     };
-  } catch (e) {
+  } catch (e: any) {
+    console.log(e.message);
+
     return {
       props: {
         user: { username: "anonymous", id: null },
@@ -109,6 +143,6 @@ export async function getServerSideProps({
 
   // const response = await fetch(getfullUrl(`api/home`), { method: "get" });
   // const data = response ? await response.json() : "dodorodo";
-}
+};
 
 export default Home;

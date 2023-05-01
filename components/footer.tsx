@@ -30,7 +30,8 @@ const Footer = () => {
           bottom: 0;
           left: 0;
           width: 100%;
-          min-height: 5rem;
+          height: 7rem;
+          box-sizing: border-box;
           background: white;
           border-top: 1px solid rgba(0, 0, 0, 0.2);
           padding: 2rem;

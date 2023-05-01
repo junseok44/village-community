@@ -1,9 +1,11 @@
 import { useUser } from "@/hooks/useUser";
 import Link from "next/link";
 import Layout from "./Layout";
+import { UserToken } from "@/pages/api/Login";
 
 const Header = () => {
-  const { data, error, isLoading } = useUser();
+  const { data, isLoading, error } = useUser();
+
   return (
     <header>
       <nav>
@@ -14,7 +16,7 @@ const Header = () => {
             </Link>
           </li>
 
-          {!isLoading && !error && data.user ? (
+          {!error && !isLoading && data.user ? (
             <>
               <li>
                 <Link href="/user/123" legacyBehavior>
@@ -22,7 +24,7 @@ const Header = () => {
                 </Link>
               </li>
               <li>
-                <a href="/post/write">write a post</a>
+                <Link href="/post/write">글 쓰기</Link>
               </li>
               <li>
                 <a href="/api/user/logout">Logout</a>

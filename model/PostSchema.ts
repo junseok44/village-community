@@ -3,9 +3,11 @@ import mongoose, { Schema, ObjectId } from "mongoose";
 const postSchema = new Schema({
   postNumber: Number,
   title: String,
-  author: Schema.Types.ObjectId,
+  author: { type: Schema.Types.ObjectId, ref: "User" },
   body: String,
   writeAt: Date,
+  category: String,
+  boardId: String,
   meta: {
     view: Number,
     likes: Number,
