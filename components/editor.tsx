@@ -9,7 +9,6 @@ import {
 } from "draft-js";
 import {
   MenuItem,
-  InputLabel,
   Box,
   Button,
   IconButton,
@@ -25,6 +24,8 @@ import { stateToHTML } from "draft-js-export-html";
 import { getfullUrl } from "@/lib/getfullUrl";
 import Router from "next/router";
 import ButtonController from "./shared/ButtonController";
+import sanitizeHTML from "sanitize-html";
+import { SelectChangeEvent } from "@mui/material/Select";
 
 const EditorComponent = ({
   postTitle,
@@ -48,12 +49,24 @@ const EditorComponent = ({
   );
   const [title, setTitle] = useState(postTitle ?? "");
   const [category, setCategory] = useState("일반");
+  const [errMsg, setErrMsg] = useState("");
+  const [fontSize, setFontSize] = useState(10);
   const editorRef = useRef<Editor | null>(null);
 
-  const handleSubmit = () => {
-    const html = stateToHTML(editorState.getCurrentContent());
+  const customStyleMap = {
+    SET_FONT_SIZE: {
+      fontSize: `${fontSize}px`,
+    },
+  };
 
-    fetch(getfullUrl("api/post/createpost"), {
+  const handleSubmit = async () => {
+    if (errMsg) setErrMsg("");
+    const html = stateToHTML(editorState.getCurrentContent());
+    if (!title.trim()) return setErrMsg("제목을 반드시 작성해야 합니다.");
+    const sanitizedHTML = sanitizeHTML(html, { allowedTags: [] });
+    if (!sanitizedHTML.trim()) return setErrMsg("내용을 입력하세요");
+
+    const response = await fetch(getfullUrl("api/post/createpost"), {
       method: "POST",
       body: JSON.stringify({
         title: title,
@@ -115,6 +128,13 @@ const EditorComponent = ({
 
     return "not-handled";
   };
+  const handleChangeTextSize = (event: SelectChangeEvent<number>) => {
+    customStyleMap.SET_FONT_SIZE = {
+      fontSize: `${event.target.value}px`,
+    };
+    setFontSize(event.target.value as number);
+    setEditorState(RichUtils.toggleInlineStyle(editorState, "SET_FONT_SIZE"));
+  };
   return (
     <>
       <div
@@ -134,9 +154,11 @@ const EditorComponent = ({
       </div>
       <div
         style={{
-          minHeight: "20rem",
+          height: "20rem",
+          overflow: "auto",
           border: "1px solid rgba(0,0,0,0.1)",
           padding: "1rem",
+          lineHeight: "1.5",
         }}
         onClick={handleFocusEditor}
       >
@@ -145,7 +167,7 @@ const EditorComponent = ({
           handleKeyCommand={handleKeyCommand}
           editorState={editorState}
           onChange={handleChange}
-          // customStyleMap={customStyleMap}
+          customStyleMap={customStyleMap}
         />
       </div>
       <Box
@@ -187,27 +209,31 @@ const EditorComponent = ({
             <StrikethroughSIcon></StrikethroughSIcon>
           </IconButton>
         </Box>
-        <Box>
-          <Select labelId="fontsize-select" label="글자크기 선택" value="16px">
-            <MenuItem value={"16px"}>16px</MenuItem>
-          </Select>
-        </Box>
-        <Box justifySelf={"flex-end"}>
-          {/* <InputLabel id="category-select">카테고리 선택</InputLabel> */}
-          <Select
-            labelId="category-select"
-            label="ca"
-            value={category}
-            onChange={(e) => {
-              setCategory(e.target.value);
-            }}
-          >
-            <MenuItem value={"일반"}>일반</MenuItem>
-            <MenuItem value={"정보글"}>정보글</MenuItem>
-            <MenuItem value={"이벤트"}>이벤트</MenuItem>
-          </Select>
-        </Box>
+        <Select
+          labelId="fontsize-select"
+          label="글자크기 선택"
+          value={fontSize}
+          onChange={(e) => handleChangeTextSize(e)}
+        >
+          {[10, 14, 18, 22, 26, 30].map((size) => (
+            <MenuItem value={size}>{size}px</MenuItem>
+          ))}
+        </Select>
+        <Select
+          labelId="category-select"
+          label="category"
+          value={category}
+          onChange={(e) => {
+            setCategory(e.target.value);
+          }}
+        >
+          <MenuItem value={"일반"}>일반</MenuItem>
+          <MenuItem value={"정보글"}>정보글</MenuItem>
+          <MenuItem value={"이벤트"}>이벤트</MenuItem>
+        </Select>
       </Box>
+      {errMsg && <div style={{ color: "red" }}>{errMsg}</div>}
+
       <ButtonController>
         <>
           {postTitle ? (

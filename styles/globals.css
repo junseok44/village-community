@@ -128,6 +128,7 @@ table {
 
 #__next {
   position: relative;
+  height: 100%;
 }
 
 .my-post-style strong {

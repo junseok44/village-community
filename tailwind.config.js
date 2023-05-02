@@ -9,7 +9,7 @@ module.exports = {
     extend: {
       minHeight: {
         back: "70%",
-        content: "calc(100vh - 5rem)",
+        content: "calc(100vh - 3.5rem)",
       },
       height: {
         back: "calc(100vh - 7rem)",

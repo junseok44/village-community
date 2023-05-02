@@ -72,7 +72,6 @@ const Home = ({ posts, user }: { user: UserToken | null; posts: TPost[] }) => {
         </ul>
         <style jsx>{`
           .Home {
-            margin-top: 1rem;
             .controller {
               .category {
                 li {

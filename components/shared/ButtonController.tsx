@@ -8,7 +8,6 @@ const ButtonController = ({ children }: { children: React.ReactNode }) => {
       sx={{
         width: "100%",
         display: "flex",
-        marginTop: "1rem",
         justifyContent: "flex-start",
       }}
     >

@@ -20,7 +20,7 @@ export const setCookie = (res: NextApiResponse, key: string, value: string) => {
 
   const myCookie = serialize(key, value, cookieOptions);
 
-  res.setHeader("Set-Cookie", myCookie);
+  res.setHeader("Set-Cookie", [myCookie]);
 };
 
 export const getDataFromCookie = async <T>(

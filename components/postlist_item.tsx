@@ -53,6 +53,7 @@ const PostListItem: React.FC<PostListItemProps> = ({
           {title}
         </Link>
       </div>
+
       <div className="item w-1/6">{author}</div>
       <div className="item w-16">{formatDate(date)}</div>
       <div className="item w-16">{views}</div>
