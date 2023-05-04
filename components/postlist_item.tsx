@@ -49,7 +49,11 @@ const PostListItem: React.FC<PostListItemProps> = ({
       <div className="item w-24">{number}</div>
       <div className="item w-24">{category}</div>
       <div className="item flex-1 title text-start">
-        <Link href={`/post/${id}`} className="w-100">
+        <Link
+          href={`/post/${id}`}
+          className="w-full h-full inline-block"
+          style={{ position: "absolute", top: 0, bottom: 0 }}
+        >
           {title}
         </Link>
       </div>
@@ -64,6 +68,7 @@ const PostListItem: React.FC<PostListItemProps> = ({
             cursor: pointer;
             background: rgba(0, 0, 0, 0.05);
           }
+          position: relative;
           display: flex;
           padding: 1rem 0rem;
           border-bottom: 1px solid rgba(0, 0, 0, 0.2);

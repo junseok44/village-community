@@ -17,6 +17,19 @@ export default async function handler(
       "post-recommend"
     );
 
+    const currentUser = await getDataFromCookie<{ id: string }>(
+      req,
+      res,
+      "user"
+    );
+
+    const currentPost = await Post.findById(postId);
+    if (!currentPost) throw Error("post not found");
+
+    if (currentPost._id == currentUser?.id) {
+      throw Error("자추는 너무 추해용~~");
+    }
+
     if (postRecommendArr && postRecommendArr.includes(postId)) {
       throw Error("중복 추천은 안되용~~");
     }
@@ -33,8 +46,6 @@ export default async function handler(
     );
     setCookie(res, "post-recommend", token);
 
-    const currentPost = await Post.findById(postId);
-    if (!currentPost) throw Error("post not found");
     currentPost.meta.likes += 1;
     await currentPost.save();
 

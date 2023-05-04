@@ -6,6 +6,7 @@ import { GetServerSideProps } from "next";
 import { checkUser } from "@/lib/user";
 import Post from "../../model/PostSchema";
 import sanitizeHTML from "sanitize-html";
+
 const Editor = dynamic(() => import("@/components/editor"), {
   ssr: false,
   loading: () => (

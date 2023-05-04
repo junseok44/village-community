@@ -2,7 +2,7 @@ import React from "react";
 
 const PlaceCenter = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="flex justify-center items-center h-full">{children}</div>
+    <div className="flex justify-center items-center pt-44">{children}</div>
   );
 };
 

@@ -8,7 +8,7 @@ module.exports = {
   theme: {
     extend: {
       minHeight: {
-        back: "70%",
+        seven: "70%",
         content: "calc(100vh - 3.5rem)",
       },
       height: {

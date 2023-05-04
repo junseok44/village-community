@@ -66,7 +66,7 @@ const EditorComponent = ({
     const sanitizedHTML = sanitizeHTML(html, { allowedTags: [] });
     if (!sanitizedHTML.trim()) return setErrMsg("내용을 입력하세요");
 
-    const response = await fetch(getfullUrl("api/post/createpost"), {
+    const response = await fetch(getfullUrl("api/post/create"), {
       method: "POST",
       body: JSON.stringify({
         title: title,

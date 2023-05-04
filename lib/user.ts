@@ -1,13 +1,7 @@
 import User from "@/model/UserSchema";
-import { debounce } from "lodash";
 import dbConnect from "./db";
-import {
-  GetServerSidePropsContext,
-  NextApiRequest,
-  NextApiResponse,
-} from "next";
+import { GetServerSidePropsContext } from "next";
 import { getDataFromCookie } from "./auth-cookies";
-import { UserToken } from "@/pages/api/Login";
 import mongoose from "mongoose";
 
 export const createUser = async ({

@@ -49,9 +49,9 @@ const Home = ({ posts, user }: { user: UserToken | null; posts: TPost[] }) => {
             <li onClick={() => handleChangeCategory("정보글")}>정보글</li>
             <li onClick={() => handleChangeCategory("이벤트")}>이벤트</li>
           </ul>
-          <Button sx={{ whiteSpace: "nowrap" }}>
-            <Link href="/post/write">새 글 작성하기</Link>
-          </Button>
+          <Link href="/post/write">
+            <Button sx={{ whiteSpace: "nowrap" }}>새 글 작성하기</Button>
+          </Link>
         </div>
         <ul className="postList">
           <PostListHeader></PostListHeader>
