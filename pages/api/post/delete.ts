@@ -10,7 +10,7 @@ export default async function handler(
     const { id } = req.body;
 
     // Find the post with the given id
-    const post = await Post.findByIdAndRemove(id);
+    const post = await Post.findOneAndDelete({ _id: id });
 
     // If the post doesn't exist, return an error
     if (!post) {

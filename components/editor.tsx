@@ -31,10 +31,14 @@ const EditorComponent = ({
   postTitle,
   postBody,
   revisePostId,
+  villageId,
+  villageCategories,
 }: {
   postTitle?: string;
   postBody?: string;
   revisePostId?: string;
+  villageId: string;
+  villageCategories: string[];
 }) => {
   const initialHTML = convertFromHTML(postBody ?? "");
   const [editorState, setEditorState] = useState(
@@ -48,7 +52,7 @@ const EditorComponent = ({
       : EditorState.createEmpty()
   );
   const [title, setTitle] = useState(postTitle ?? "");
-  const [category, setCategory] = useState("일반");
+  const [category, setCategory] = useState(villageCategories[0]);
   const [errMsg, setErrMsg] = useState("");
   const [fontSize, setFontSize] = useState(10);
   const editorRef = useRef<Editor | null>(null);
@@ -72,6 +76,7 @@ const EditorComponent = ({
         title: title,
         body: html,
         category,
+        villageId,
       }),
       headers: {
         "Content-Type": "application/json",
@@ -227,9 +232,9 @@ const EditorComponent = ({
             setCategory(e.target.value);
           }}
         >
-          <MenuItem value={"일반"}>일반</MenuItem>
-          <MenuItem value={"정보글"}>정보글</MenuItem>
-          <MenuItem value={"이벤트"}>이벤트</MenuItem>
+          {villageCategories.map((category) => (
+            <MenuItem value={category}>{category}</MenuItem>
+          ))}
         </Select>
       </Box>
       {errMsg && <div style={{ color: "red" }}>{errMsg}</div>}

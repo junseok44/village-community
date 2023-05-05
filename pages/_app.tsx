@@ -1,9 +1,8 @@
 import Layout from "@/components/Layout";
 import Footer from "@/components/footer";
 import Header from "@/components/header";
-import { getDataFromCookie } from "@/lib/auth-cookies";
+import dbConnect from "@/lib/db";
 import "@/styles/globals.css";
-import { NextPageContext } from "next";
 import type { AppProps } from "next/app";
 
 export default function App({ Component, pageProps }: AppProps) {
@@ -18,11 +17,10 @@ export default function App({ Component, pageProps }: AppProps) {
   );
 }
 
-// export async function getInitialProps(ctx: any) {
-//   console.log("initial");
-
-//   // if (ctx.req) {
-//   //   console.log(ctx.req);
-//   //   // const session = getDataFromCookie(ctx.req, ctx.res, "user");
-//   // }
-// }
+export async function getStaticProps() {
+  try {
+    await dbConnect();
+  } catch (error) {
+    console.log(error);
+  }
+}

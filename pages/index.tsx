@@ -3,13 +3,11 @@ import PostList_Item from "@/components/postlist_item";
 import { Button } from "@mui/material";
 import dbConnect from "@/lib/db";
 import Post from "../model/PostSchema";
-import { GetServerSideProps, NextApiRequest, NextApiResponse } from "next";
+import { GetServerSideProps } from "next";
 import React from "react";
 import { UserToken } from "./api/Login";
 import { checkUser } from "@/lib/user";
 import Link from "next/link";
-import Header from "@/components/header";
-import Layout from "@/components/Layout";
 import { useRouter } from "next/router";
 
 export interface TPost {
@@ -44,10 +42,14 @@ const Home = ({ posts, user }: { user: UserToken | null; posts: TPost[] }) => {
       <div className="Home">
         <div className="controller flex justify-between items-center">
           <ul className="category flex">
-            <li onClick={() => handleChangeCategory("")}>전체</li>
-            <li onClick={() => handleChangeCategory("일반")}>일반</li>
-            <li onClick={() => handleChangeCategory("정보글")}>정보글</li>
-            <li onClick={() => handleChangeCategory("이벤트")}>이벤트</li>
+            <li key={"전체"} onClick={() => handleChangeCategory("")}>
+              전체
+            </li>
+            {["일반", "정보글", "이벤트"].map((category) => (
+              <li key={category} onClick={() => handleChangeCategory(category)}>
+                {category}
+              </li>
+            ))}
           </ul>
           <Link href="/post/write">
             <Button sx={{ whiteSpace: "nowrap" }}>새 글 작성하기</Button>
@@ -55,10 +57,10 @@ const Home = ({ posts, user }: { user: UserToken | null; posts: TPost[] }) => {
         </div>
         <ul className="postList">
           <PostListHeader></PostListHeader>
-          {posts &&
+          {posts && posts.length > 0 ? (
             posts.map((post, index) => (
               <PostList_Item
-                key={index}
+                key={post._id}
                 id={post._id}
                 author={post.author?.username ?? "no"}
                 category={post.category ?? "일반"}
@@ -68,7 +70,10 @@ const Home = ({ posts, user }: { user: UserToken | null; posts: TPost[] }) => {
                 views={post.meta.view}
                 title={post.title}
               ></PostList_Item>
-            ))}
+            ))
+          ) : (
+            <div>게시글이 없습니다. 1빠따 어떠세요?</div>
+          )}
         </ul>
         <style jsx>{`
           .Home {
@@ -114,14 +119,23 @@ const Home = ({ posts, user }: { user: UserToken | null; posts: TPost[] }) => {
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   try {
     await dbConnect();
+
+    const user = await checkUser(ctx);
+
+    if (!user)
+      return {
+        redirect: {
+          destination: "/VillageInfo",
+          permanent: false,
+        },
+      };
+
     const posts = await Post.find({
       ...(ctx.query.category && { category: ctx.query.category }),
     })
       .populate("author")
       .sort([["writeAt", -1]])
       .exec();
-
-    const user = await checkUser(ctx);
 
     return {
       props: {

@@ -2,8 +2,6 @@
 - [ ] login logic
 
 * [ ] 좀 더 확장성있게는 안되려나..
-      FIXME
-      지금 문제는
 
 1. 헤더 FETCH가 늦게 된다.
 2. 헤더와 index에서 따로따로 fetch한다. 그래서.

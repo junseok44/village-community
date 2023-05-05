@@ -4,28 +4,51 @@ import React from "react";
 const Form = ({
   isLogin,
   errorMsg,
+  villageList,
+  villageSelectValue,
   onSubmit,
+  onSelect,
 }: {
   isLogin: boolean;
   errorMsg: string;
+  villageList: string[] | null;
+  villageSelectValue?: string;
   onSubmit: (e: React.FormEvent) => void;
+  onSelect: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   return (
     <div className="login">
       <form onSubmit={onSubmit}>
         {errorMsg && <div style={{ color: "red" }}>{errorMsg}</div>}
         <label>
-          <span>Username</span>
+          <span>유저명</span>
           <input type="text" name="username" />
         </label>
         <label>
-          <span>Password</span>
+          <span>비밀번호</span>
           <input type="password" name="password" required />
         </label>
         {!isLogin && (
           <label>
-            <span>Repeat password</span>
+            <span>비밀번호 재입력</span>
             <input type="password" name="rpassword" required />
+          </label>
+        )}
+        {villageList && (
+          <label>
+            <span>들어가실 마을을 선택해주세요</span>
+            <select
+              onChange={(e) => {
+                onSelect(e.target.value);
+              }}
+              value={villageSelectValue}
+            >
+              {villageList.map((name) => (
+                <option value={name} key={name}>
+                  {name}
+                </option>
+              ))}
+            </select>
           </label>
         )}
 
@@ -33,16 +56,16 @@ const Form = ({
           {isLogin ? (
             <>
               <Link href="/SignUp" legacyBehavior>
-                <a>I don't have an account</a>
+                <a>계정이 없으세요?</a>
               </Link>
-              <button type="submit">Login</button>
+              <button type="submit">로그인</button>
             </>
           ) : (
             <>
               <Link href="/Login" legacyBehavior>
-                <a>I already have an account</a>
+                <a>이미 계정이 있으신가요?</a>
               </Link>
-              <button type="submit">Signup</button>
+              <button type="submit">회원가입</button>
             </>
           )}
         </div>
@@ -84,6 +107,7 @@ const Form = ({
           background: #fff;
           border: 1px solid #ccc;
           border-radius: 4px;
+          margin-left: 1rem;
         }
         .submit > button:hover {
           border-color: #888;

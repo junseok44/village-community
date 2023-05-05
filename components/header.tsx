@@ -1,7 +1,5 @@
 import { useUser } from "@/hooks/useUser";
 import Link from "next/link";
-import Layout from "./Layout";
-import { UserToken } from "@/pages/api/Login";
 
 const Header = () => {
   const { data, isLoading, error } = useUser();
@@ -9,13 +7,13 @@ const Header = () => {
   return (
     <header>
       <nav>
+        {/* <h5>{data.user.villageId}</h5> */}
         <ul>
           <li>
             <Link href="/" legacyBehavior>
-              <a>Home</a>
+              <a>홈으로</a>
             </Link>
           </li>
-
           {!error && !isLoading && data.user ? (
             <>
               <li>
@@ -27,15 +25,22 @@ const Header = () => {
                 <Link href="/post/write">글 쓰기</Link>
               </li>
               <li>
-                <a href="/api/user/logout">Logout</a>
+                <a href="/api/user/logout">로그아웃</a>
               </li>
             </>
           ) : (
-            <li>
-              <Link href="/Login" legacyBehavior>
-                <a>Login</a>
-              </Link>
-            </li>
+            <>
+              <li>
+                <Link href="/Login" legacyBehavior>
+                  <a>로그인</a>
+                </Link>
+              </li>
+              <li>
+                <Link href="/SignUp" legacyBehavior>
+                  <a>회원가입</a>
+                </Link>
+              </li>
+            </>
           )}
         </ul>
       </nav>

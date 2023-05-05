@@ -5,7 +5,6 @@ import "../model/UserSchema";
 const DB_URI = `${process.env.DB_URL}${process.env.DB_NAME}`;
 
 let cached = global.mongoose;
-// FIXME
 
 // global.mongoose가 없으면 initialize.
 if (!cached) {

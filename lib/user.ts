@@ -7,24 +7,25 @@ import mongoose from "mongoose";
 export const createUser = async ({
   username,
   password,
+  villageId,
 }: {
   username: string;
   password: string;
+  villageId: string;
 }) => {
   try {
     await dbConnect();
     const user = new User({
       username,
       password,
-      villageId: new mongoose.Types.ObjectId(),
+      villageId: villageId,
     });
     await user.hashPassword(user.password);
     await user.save();
 
     return user;
   } catch (e) {
-    console.log(e);
-    throw Error("user creation failed");
+    console.log("create user : user creation failed");
   }
 };
 

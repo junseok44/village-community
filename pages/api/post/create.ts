@@ -1,8 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import mongoose from "mongoose";
 import Post from "../../../model/PostSchema";
 import { getDataFromCookie } from "@/lib/auth-cookies";
-import { findUser } from "@/lib/user";
 import sanitizeHTML from "sanitize-html";
 import { UserToken } from "../Login";
 export default async function handler(
@@ -10,20 +8,20 @@ export default async function handler(
   res: NextApiResponse
 ) {
   try {
-    let { title, body, category } = req.body;
+    let { title, body, category, villageId } = req.body;
 
     const userData = await getDataFromCookie<UserToken>(req, res, "user");
 
     body = sanitizeHTML(body, {
       allowedTags: ["del", "b", "strong", "p", "em", "br"],
     });
-    console.log(category);
 
     const newPost = await new Post({
       title,
       postNumber: 123,
       author: userData!.id,
       body: body,
+      villageId,
       category: category,
       writeAt: Date.now(),
       meta: { view: 0, likes: 0 },

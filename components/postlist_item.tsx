@@ -52,7 +52,13 @@ const PostListItem: React.FC<PostListItemProps> = ({
         <Link
           href={`/post/${id}`}
           className="w-full h-full inline-block"
-          style={{ position: "absolute", top: 0, bottom: 0 }}
+          style={{
+            position: "absolute",
+            top: 0,
+            bottom: 0,
+            display: "flex",
+            alignItems: "center",
+          }}
         >
           {title}
         </Link>
@@ -65,7 +71,6 @@ const PostListItem: React.FC<PostListItemProps> = ({
       <style jsx>{`
         li {
           &:hover {
-            cursor: pointer;
             background: rgba(0, 0, 0, 0.05);
           }
           position: relative;
@@ -79,6 +84,9 @@ const PostListItem: React.FC<PostListItemProps> = ({
               text-align: center;
             }
             &.title {
+              &:hover {
+                cursor: pointer;
+              }
             }
             padding: 0 0.5rem;
             overflow: hidden;

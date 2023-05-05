@@ -1,6 +1,17 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema, Types } from "mongoose";
+import { TPost } from "./PostSchema";
+import { TUser } from "./UserSchema";
 
-const VillageSchema = new mongoose.Schema({
+export interface TVillage {
+  _id: string;
+  villageName: string;
+  category: string[];
+  admin: Types.ObjectId;
+  posts: Types.ObjectId[];
+  users: Types.ObjectId[];
+}
+
+const VillageSchema = new mongoose.Schema<TVillage>({
   villageName: String,
   category: [{ type: String }],
   admin: { type: Schema.Types.ObjectId, ref: "User" },
@@ -9,4 +20,4 @@ const VillageSchema = new mongoose.Schema({
 });
 
 export default mongoose.models.Village ||
-  mongoose.model("Village", VillageSchema);
+  mongoose.model<TVillage>("Village", VillageSchema);

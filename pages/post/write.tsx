@@ -3,9 +3,11 @@ import Head from "next/head";
 import React from "react";
 import EditorLoading from "@/components/PostLayout";
 import { GetServerSideProps } from "next";
-import { checkUser } from "@/lib/user";
-import Post from "../../model/PostSchema";
-import sanitizeHTML from "sanitize-html";
+import Post from "@/model/PostSchema";
+import Village from "@/model/VillageSchema";
+import { getDataFromCookie } from "@/lib/auth-cookies";
+import { UserToken } from "../api/Login";
+import dbConnect from "@/lib/db";
 
 const Editor = dynamic(() => import("@/components/editor"), {
   ssr: false,
@@ -16,9 +18,11 @@ const Editor = dynamic(() => import("@/components/editor"), {
   ),
 });
 
-const WritePostPage = ({
-  currentPost,
-}: {
+interface WritePostPageProps {
+  village: {
+    id: string;
+    categories: string[];
+  };
   currentPost:
     | {
         title: string;
@@ -26,7 +30,9 @@ const WritePostPage = ({
         id: string;
       }
     | undefined;
-}) => {
+}
+
+const WritePostPage = ({ currentPost, village }: WritePostPageProps) => {
   return (
     <div className="write">
       <Head>
@@ -37,6 +43,8 @@ const WritePostPage = ({
         postTitle={currentPost?.title}
         postBody={currentPost?.body}
         revisePostId={currentPost?.id}
+        villageId={village.id}
+        villageCategories={village.categories}
       ></Editor>
       <style jsx>{`
         .write {
@@ -50,7 +58,9 @@ const WritePostPage = ({
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   try {
-    const user = await checkUser(ctx);
+    await dbConnect();
+    const user = await getDataFromCookie<UserToken>(ctx.req, ctx.res, "user");
+
     if (!user) {
       return {
         redirect: {
@@ -60,9 +70,21 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       };
     }
 
+    const userVillage = await Village.findById(user.villageId);
+    if (!userVillage) throw Error("no village in this user");
+
     const { postId } = ctx.query;
     const currentPost = await Post.findById(postId);
-    if (!currentPost) return { props: {} };
+    if (!currentPost)
+      return {
+        props: {
+          village: {
+            id: userVillage._id.toString(),
+            categories: userVillage.category,
+          },
+        },
+      };
+
     return {
       props: {
         currentPost: {
@@ -70,13 +92,20 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
           body: currentPost.body,
           id: currentPost._id.toString(),
         },
+        village: {
+          id: userVillage._id.toString(),
+          categories: userVillage.category,
+        },
       },
     };
   } catch (error) {
     console.log(error);
 
     return {
-      props: {},
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
     };
   }
 };
