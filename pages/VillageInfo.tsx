@@ -1,8 +1,11 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import CenterLayout from "@/components/shared/CenterLayout";
 import { GetServerSideProps } from "next";
 import Village, { TVillage } from "@/model/VillageSchema";
 import dbConnect from "@/lib/db";
+import VillageInfoCard from "@/components/VillageInfoCard";
+import { Stack, Typography } from "@mui/material";
+import Carosel from "@/components/Carosel";
 
 // TODO : 각 스키마의 타입을 정의.
 interface VillageInfoProps {
@@ -12,15 +15,29 @@ interface VillageInfoProps {
 const VillageInfo = ({ villages }: VillageInfoProps) => {
   return (
     <CenterLayout>
-      <div>
-        <div>어떤 village에 관심이 있으세요?</div>
-        {villages &&
-          villages.map((village) => (
-            <div key={village._id}>{village.villageName}</div>
-          ))}
-        <div>회원가입하시면 들어갈 수 있어요!</div>
-        <div>이미 회원이신가요?</div>
-      </div>
+      <Stack gap={3} alignItems={"center"} sx={{ width: "90%" }}>
+        <Typography variant="h4">어떤 마을에 관심이 있으세요?</Typography>
+        <Carosel></Carosel>
+        <Stack
+          direction="row"
+          columnGap={2}
+          sx={{ border: "1px solid black", width: "80%" }}
+        >
+          {villages &&
+            villages.map((village) => (
+              <VillageInfoCard
+                key={village._id}
+                title="오타쿠 마을"
+                description="dfd"
+              ></VillageInfoCard>
+            ))}
+        </Stack>
+
+        <Stack direction="row" alignItems={"center"} columnGap={2}>
+          <div>회원가입하시면 들어갈 수 있어요!</div>
+          <Typography color={"Highlight"}>이미 회원이신가요?</Typography>
+        </Stack>
+      </Stack>
     </CenterLayout>
   );
 };
