@@ -1,77 +1,69 @@
-import React, { useState, useRef } from "react";
-import styled from "@emotion/styled";
+import * as S from "../styles/Carousel";
+import React, { useState, useRef, useEffect, useLayoutEffect } from "react";
 
-const SlideWrapper = styled.div<{ xPos: number }>`
-  display: flex;
-  transform: translateX(${(props) => props.xPos}rem);
-  transition: transform 0.5s ease-in-out;
-  white-space: nowrap;
-  background: white;
-  height: 100%;
-`;
-
-const SlideContainer = styled.div`
-  height: 15rem;
-  width: 80rem;
-  position: relative;
-  min-height: 15rem;
-  border: 1px solid black;
-  background: white;
-  overflow: hidden;
-`;
-
-const SlideItem = styled.div`
-  flex-shrink: 0;
-  width: 20rem;
-  height: 100%;
-  border: 1px solid black;
-  background: black;
-  color: white;
-  z-index: 100;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const PrevArrow = styled.div`
-  position: absolute;
-  left: -100px;
-  top: 50%;
-  cursor: pointer;
-  background: black;
-  z-index: 100;
-`;
-
-const NextArrow = styled.div`
-  position: absolute;
-  right: -100px;
-  top: 50%;
-  cursor: pointer;
-`;
-
-// Define the interface for the carousel item
 interface CarouselItem {
   id: number;
   title: string;
-  image: string | null;
 }
 
-// Define the props interface for the carousel component
 interface CarouselProps {
-  items: CarouselItem[];
+  items: JSX.Element[];
+  windowSize: number;
 }
 
-const Carosel = () => {
-  // const initialPosition = windowItem
-  const [xPos, setXPos] = useState(-100);
-  const [index, setIndex] = useState(0);
-  const sliderWrapper = useRef<HTMLDivElement>(null);
-  const client = sliderWrapper.current?.getBoundingClientRect();
-  const itemWidth = 20;
-  // itemWidth를 정해두는게 아니라. windowsize를 정하면 그걸 itemWidth로 나눠주는것.
-  const windowItem = 5;
+// TODO: 미완. CLIENT 위치에 기반해서 WIDTH 설정. PADDING 고려.
+// TODO: 여러번 연타할시 에러
 
-  const numberArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+let timer: NodeJS.Timeout;
+const Carosel = ({ items, windowSize }: CarouselProps) => {
+  const sliderWrapper = useRef<HTMLDivElement>(null);
+  const [itemWidth, setItemWidth] = useState(0);
+  const initialPos = -itemWidth * windowSize;
+  const [xPos, setXPos] = useState(initialPos);
+  const [index, setIndex] = useState(0);
+  const [isMoving, setIsMoving] = useState(false);
+
+  if (index == items.length && sliderWrapper.current) {
+    sliderWrapper.current.ontransitionend = () => {
+      if (sliderWrapper.current) {
+        transitionOff();
+        moveToIndex(0);
+        sliderWrapper.current.ontransitionend = null;
+      }
+    };
+  }
+  if (index == -windowSize && sliderWrapper.current) {
+    sliderWrapper.current.ontransitionend = () => {
+      if (sliderWrapper.current) {
+        transitionOff();
+        moveToIndex(
+          items.length >= windowSize
+            ? items.length - windowSize
+            : (windowSize % items.length) + 1
+        );
+        sliderWrapper.current.ontransitionend = null;
+      }
+    };
+  }
+
+  const handleAutoPlay = () => {
+    timer = setInterval(() => {
+      transitionOn();
+      setIndex((index) => index + 1);
+      setXPos((prev) => prev - itemWidth);
+    }, 3000);
+  };
+  const stopAutoPlay = () => {
+    clearInterval(timer);
+  };
+
+  useLayoutEffect(() => {
+    const client = sliderWrapper.current?.getBoundingClientRect();
+    if (client) {
+      setItemWidth(client.width / windowSize);
+      setXPos(-(client.width / windowSize) * windowSize);
+    }
+  }, [sliderWrapper, windowSize]);
 
   const transitionOff = () => {
     if (sliderWrapper.current) sliderWrapper.current.style.transition = "none";
@@ -89,60 +81,78 @@ const Carosel = () => {
     if (!sliderWrapper.current) return;
     transitionOn();
     moveToIndex(index - 1);
-
-    if (index == -3) {
-      sliderWrapper.current.ontransitionend = () => {
-        if (sliderWrapper.current) {
-          transitionOff();
-          moveToIndex(6);
-          sliderWrapper.current.ontransitionend = null;
-        }
-      };
-    }
   };
 
   const handleNextArrow = () => {
     if (!sliderWrapper.current) return;
     transitionOn();
     moveToIndex(index + 1);
+  };
 
-    if (index == 9) {
-      sliderWrapper.current.ontransitionend = () => {
-        if (sliderWrapper.current) {
-          transitionOff();
-          moveToIndex(0);
-          sliderWrapper.current.ontransitionend = null;
+  const sliceBack = (arr: JSX.Element[], windowSize: number) => {
+    let result = [];
+
+    if (arr.length >= windowSize) {
+      result = arr.slice(arr.length - windowSize);
+    } else {
+      while (result.length < windowSize) {
+        for (let i = arr.length - 1; i >= 0; i--) {
+          result.unshift(arr[i]);
+          if (result.length >= windowSize) break;
         }
-      };
+      }
     }
+
+    return result;
   };
 
+  const sliceFront = (arr: JSX.Element[], windowSize: number) => {
+    let result = [];
+
+    if (arr.length >= windowSize) {
+      result = arr.slice(0, windowSize);
+    } else {
+      while (result.length < windowSize) {
+        for (let i = 0; i < arr.length; i++) {
+          result.push(arr[i]);
+          if (result.length >= windowSize) break;
+        }
+      }
+    }
+    return result;
+  };
   const moveToIndex = (index: number) => {
+    if (index == -windowSize - 1 || index == items.length + 1) return;
     if (!sliderWrapper.current) return;
-    setXPos(-100 - index * 20);
+    if (isMoving) forceTransition();
+    setIsMoving(true);
     setIndex(index);
+    setXPos(initialPos - index * itemWidth);
+    setIsMoving(false);
   };
-
   return (
     <>
-      <SlideContainer>
-        <PrevArrow onClick={handlePrevArrow}>back</PrevArrow>
-        <SlideWrapper xPos={xPos} ref={sliderWrapper}>
-          {numberArray.slice(5).map((item) => (
-            <SlideItem>{item}</SlideItem>
+      <S.SlideContainer>
+        <S.PrevArrow onClick={handlePrevArrow}>back</S.PrevArrow>
+        <S.SlideWrapper xPos={xPos} ref={sliderWrapper}>
+          {sliceBack(items, windowSize).map((item) => (
+            <S.SlideItem width={itemWidth}>{item}</S.SlideItem>
           ))}
-          {numberArray.map((item) => (
-            <SlideItem>{item}</SlideItem>
+          {items.map((item) => (
+            <S.SlideItem width={itemWidth}>{item}</S.SlideItem>
           ))}
-          {numberArray.slice(0, 5).map((item) => (
-            <SlideItem>{item}</SlideItem>
+
+          {sliceFront(items, windowSize).map((item) => (
+            <S.SlideItem width={itemWidth}>{item}</S.SlideItem>
           ))}
-        </SlideWrapper>
-        <NextArrow onClick={handleNextArrow}>next</NextArrow>
-      </SlideContainer>
+        </S.SlideWrapper>
+        <S.NextArrow onClick={handleNextArrow}>next</S.NextArrow>
+      </S.SlideContainer>
       <div>{index}</div>
       <button onClick={handlePrevArrow}>prev</button>
       <button onClick={handleNextArrow}>next</button>
+      <button onClick={handleAutoPlay}>autoplay</button>
+      <button onClick={stopAutoPlay}>stopAutoplay</button>
     </>
   );
 };

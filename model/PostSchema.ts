@@ -55,30 +55,29 @@ postSchema.pre("save", async function (next) {
   }
 });
 
-// postSchema.pre("findOneAndDelete", { query: true }, async function (next) {
-//   console.log("removing post from users and village");
+postSchema.pre("findOneAndDelete", { query: true }, async function (next) {
+  console.log("removing post from users and village");
 
-//   try {
-//     console.log(this);
+  try {
+    // const removedPost = await this.findOne();
+    // const village = await Village.findByIdAndUpdate(
+    //   removedPost.villageId,
+    //   { $pull: { posts: removedPost._id } },
+    //   { new: true }
+    // );
+    // if (!village) throw new Error("Village not found");
 
-//     const removedPost = await this.findOne();
-//     // const village = await Village.findByIdAndUpdate(
-//     //   removedPost.villageId,
-//     //   { $pull: { posts: removedPost._id } },
-//     //   { new: true }
-//     // );
-//     // if (!village) throw new Error("Village not found");
+    // const user = await User.findByIdAndUpdate(removedPost.author, {
+    //   $pull: { posts: removedPost._id },
+    // });
+    // if (!user) throw new Error("User not found");
 
-//     // const user = await User.findByIdAndUpdate(removedPost.author, {
-//     //   $pull: { posts: removedPost._id },
-//     // });
-//     // if (!user) throw new Error("User not found");
-
-//     // next();
-//   } catch (error: any) {
-//     console.log(error.message);
-//     next(error);
-//   }
-// });
+    // next();
+    next();
+  } catch (error: any) {
+    console.log(error.message);
+    next(error);
+  }
+});
 
 export default mongoose.models.Post || mongoose.model("Post", postSchema);

@@ -122,7 +122,17 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   try {
     dbConnect();
-    const post = await Post.findById(postId).populate("author").exec();
+    const post = await Post.findByIdAndUpdate(
+      postId,
+      {
+        $inc: {
+          "meta.view": 1,
+        },
+      },
+      { new: true }
+    )
+      .populate("author")
+      .exec();
     const user = await getDataFromCookie<UserToken>(
       context.req,
       context.res,

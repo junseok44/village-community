@@ -15,7 +15,7 @@ interface VillageInfoCardProps {
 
 const VillageInfoCard = ({ title, description }: VillageInfoCardProps) => {
   return (
-    <Card sx={{ width: 300 }}>
+    <Card sx={{ flexShrink: 0 }}>
       <Image
         src={VillageImage}
         alt="picture of village"
