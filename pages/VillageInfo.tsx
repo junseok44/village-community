@@ -1,11 +1,11 @@
-import React, { useState, useRef, useEffect } from "react";
+import React from "react";
 import CenterLayout from "@/components/shared/CenterLayout";
 import { GetServerSideProps } from "next";
 import Village, { TVillage } from "@/model/VillageSchema";
 import dbConnect from "@/lib/db";
 import VillageInfoCard from "@/components/VillageInfoCard";
 import { Stack, Typography } from "@mui/material";
-import Carosel from "@/components/Carosel";
+import Carosel from "@/components/Carousel";
 import Link from "next/link";
 
 // TODO : 각 스키마의 타입을 정의.

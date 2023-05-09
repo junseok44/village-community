@@ -1,21 +1,14 @@
 import * as S from "../styles/Carousel";
 import React, { useState, useRef, useEffect, useLayoutEffect } from "react";
 
-interface CarouselItem {
-  id: number;
-  title: string;
-}
-
 interface CarouselProps {
   items: JSX.Element[];
   windowSize: number;
 }
 
-// TODO: 미완. CLIENT 위치에 기반해서 WIDTH 설정. PADDING 고려.
-// TODO: 여러번 연타할시 에러
-
+let isAutoplay = false;
 let timer: NodeJS.Timeout;
-const Carosel = ({ items, windowSize }: CarouselProps) => {
+const Carousel = ({ items, windowSize }: CarouselProps) => {
   const sliderWrapper = useRef<HTMLDivElement>(null);
   const [itemWidth, setItemWidth] = useState(0);
   const initialPos = -itemWidth * windowSize;
@@ -63,7 +56,17 @@ const Carosel = ({ items, windowSize }: CarouselProps) => {
       setItemWidth(client.width / windowSize);
       setXPos(-(client.width / windowSize) * windowSize);
     }
+    console.log(isAutoplay, itemWidth);
   }, [sliderWrapper, windowSize]);
+
+  useLayoutEffect(() => {
+    if (!isAutoplay && itemWidth > 0) {
+      console.log(isAutoplay, itemWidth);
+
+      handleAutoPlay();
+      isAutoplay = true;
+    }
+  }, [itemWidth]);
 
   const transitionOff = () => {
     if (sliderWrapper.current) sliderWrapper.current.style.transition = "none";
@@ -122,7 +125,9 @@ const Carosel = ({ items, windowSize }: CarouselProps) => {
     return result;
   };
   const moveToIndex = (index: number) => {
-    if (index == -windowSize - 1 || index == items.length + 1) return;
+    if (index == -windowSize - 1 || index == items.length + 1) {
+      return;
+    }
     if (!sliderWrapper.current) return;
     if (isMoving) forceTransition();
     setIsMoving(true);
@@ -149,12 +154,10 @@ const Carosel = ({ items, windowSize }: CarouselProps) => {
         <S.NextArrow onClick={handleNextArrow}>next</S.NextArrow>
       </S.SlideContainer>
       <div>{index}</div>
-      <button onClick={handlePrevArrow}>prev</button>
-      <button onClick={handleNextArrow}>next</button>
-      <button onClick={handleAutoPlay}>autoplay</button>
-      <button onClick={stopAutoPlay}>stopAutoplay</button>
+      {/* <button onClick={handleAutoPlay}>autoplay</button> */}
+      {/* <button onClick={stopAutoPlay}>stopAutoplay</button> */}
     </>
   );
 };
 
-export default Carosel;
+export default Carousel;

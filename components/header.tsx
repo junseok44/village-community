@@ -22,7 +22,7 @@ const Header = () => {
                 </Link>
               </li>
               <li>
-                <Link href="/post/write">글 쓰기</Link>
+                <Link href="/post/write">글쓰기</Link>
               </li>
               <li>
                 <a href="/api/user/logout">로그아웃</a>

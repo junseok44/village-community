@@ -45,7 +45,7 @@ const PostListItem: React.FC<PostListItemProps> = ({
   likes,
 }) => {
   return (
-    <li>
+    <li className="postList_item">
       <div className="item w-24">{number}</div>
       <div className="item w-24">{category}</div>
       <div className="item flex-1 title text-start">
@@ -63,7 +63,6 @@ const PostListItem: React.FC<PostListItemProps> = ({
           {title}
         </Link>
       </div>
-
       <div className="item w-1/6">{author}</div>
       <div className="item w-16">{formatDate(date)}</div>
       <div className="item w-16">{views}</div>

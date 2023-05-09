@@ -12,6 +12,16 @@ import Modal from "@/components/shared/Modal";
 import { useRouter } from "next/router";
 import { getfullUrl } from "@/lib/getfullUrl";
 import PostBody from "@/components/shared/PostBody";
+import styled from "@emotion/styled";
+import CommentItem, { ListItemLayout } from "@/components/Post_Comment_Item";
+import WriteComment from "@/components/comment_write";
+
+const CommentBox = styled.div`
+  border-bottom: 3px solid blue;
+  &:first-of-type {
+    border-top: 3px solid blue;
+  }
+`;
 
 const PostPage = ({ post, isAuthor }: { post: TPost; isAuthor: boolean }) => {
   const router = useRouter();
@@ -53,21 +63,12 @@ const PostPage = ({ post, isAuthor }: { post: TPost; isAuthor: boolean }) => {
     }
   };
   return (
-    <div className="pt-16">
+    <div className="pt-16 max-w-6xl mx-auto">
       <Stack gap="1rem">
         <Typography variant="h4">{post.title}</Typography>
         <Divider></Divider>
         <PostBody html={post.body}></PostBody>
-        {isModal && (
-          <Modal
-            message="삭제하시겠습니까?"
-            onConfirm={handlePostDelete}
-            onCancel={() => {
-              setIsModal(false);
-            }}
-          ></Modal>
-        )}
-        {/* <ButtonController> */}
+
         <Stack direction="row" justifyContent={"space-between"} gap={2}>
           <Stack direction="row" gap={"0.5rem"} alignItems="center">
             <ThumbUpAltRoundedIcon></ThumbUpAltRoundedIcon>
@@ -100,9 +101,26 @@ const PostPage = ({ post, isAuthor }: { post: TPost; isAuthor: boolean }) => {
             </Stack>
           )}
         </Stack>
-        {/* </ButtonController> */}
+        <div className="mt-20">
+          <CommentBox>
+            <CommentItem nestedItem={["df"]}></CommentItem>
+          </CommentBox>
+          <CommentBox>
+            <ListItemLayout>
+              <WriteComment></WriteComment>
+            </ListItemLayout>
+          </CommentBox>
+        </div>
       </Stack>
-
+      {isModal && (
+        <Modal
+          message="삭제하시겠습니까?"
+          onConfirm={handlePostDelete}
+          onCancel={() => {
+            setIsModal(false);
+          }}
+        ></Modal>
+      )}
       <style jsx>{`
         h1 {
           font-size: 2rem;
