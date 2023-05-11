@@ -2,7 +2,7 @@ import PostListHeader from "@/components/postlist_header";
 import PostList_Item from "@/components/postlist_item";
 import { Button } from "@mui/material";
 import dbConnect from "@/lib/db";
-import Post from "../model/PostSchema";
+import Post, { TPost } from "../model/PostSchema";
 import { GetServerSideProps } from "next";
 import React from "react";
 import { UserToken } from "./api/Login";
@@ -11,23 +11,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { getDataFromCookie } from "@/lib/auth-cookies";
 import { Stack } from "@mui/material";
-
-export interface TPost {
-  _id: string;
-  title: string;
-  postNumber: number;
-  body: string;
-  author: {
-    id: string;
-    username: string;
-  } | null;
-  meta: {
-    view: number;
-    likes: number;
-  };
-  writeAt: Date;
-  category: string;
-}
+import { TUser } from "@/model/UserSchema";
 
 interface HomeProps {
   user: UserToken | null;
@@ -85,12 +69,12 @@ const Home = ({ posts, user, village, totalPost }: HomeProps) => {
               {posts && posts.length > 0 ? (
                 posts.map((post, index) => (
                   <PostList_Item
-                    key={post._id}
+                    key={post.postNumber ?? "123"}
                     id={post._id}
-                    author={post.author?.username ?? "no"}
+                    author={(post.author as TUser)?.username ?? "no user"}
                     category={post.category ?? "일반"}
                     date={post.writeAt}
-                    number={post.postNumber}
+                    number={post.postNumber ?? 123}
                     likes={post.meta.likes}
                     views={post.meta.view}
                     title={post.title}

@@ -1,8 +1,10 @@
+import { formatDate } from "@/lib/formatDate";
+import { ObjectId } from "mongoose";
 import Link from "next/link";
 import React from "react";
 
 type PostListItemProps = {
-  id: string;
+  id: ObjectId;
   number: number;
   category: string;
   title: string;
@@ -11,27 +13,6 @@ type PostListItemProps = {
   views: number;
   likes: number;
 };
-
-function formatDate(timestamp: Date) {
-  const now = Date.now();
-  const date = new Date(timestamp);
-  const isToday = date.toDateString() === new Date(now).toDateString();
-
-  if (isToday) {
-    // Display time if it's today
-    const hours = date.getHours().toString().padStart(2, "0");
-    const minutes = date.getMinutes().toString().padStart(2, "0");
-    return `${hours}:${minutes}`;
-  } else {
-    // Display date if it's not today
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const day = date.getDate().toString().padStart(2, "0");
-    const year = date.getFullYear().toString();
-    const hours = date.getHours().toString().padStart(2, "0");
-    const minutes = date.getMinutes().toString().padStart(2, "0");
-    return `${month}/${day}`;
-  }
-}
 
 // Destructure the props object and use it to render the component
 const PostListItem: React.FC<PostListItemProps> = ({

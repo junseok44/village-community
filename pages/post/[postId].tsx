@@ -1,9 +1,9 @@
 import dbConnect from "@/lib/db";
+// import Comment from "@/model/CommentSchema";
 import Post from "@/model/PostSchema";
 import { GetServerSideProps } from "next";
 import React from "react";
-import { TPost } from "..";
-import { getDataFromCookie, setCookie } from "@/lib/auth-cookies";
+import { getDataFromCookie } from "@/lib/auth-cookies";
 import { UserToken } from "../api/Login";
 import { Stack, Divider, Button, Typography } from "@mui/material";
 import ThumbUpAltRoundedIcon from "@mui/icons-material/ThumbUpAltRounded";
@@ -13,8 +13,11 @@ import { useRouter } from "next/router";
 import { getfullUrl } from "@/lib/getfullUrl";
 import PostBody from "@/components/shared/PostBody";
 import styled from "@emotion/styled";
-import CommentItem, { ListItemLayout } from "@/components/Post_Comment_Item";
-import WriteComment from "@/components/comment_write";
+import CommentItem, { ListItemLayout } from "@/components/comment/comment_item";
+import WriteComment from "@/components/comment/comment_write";
+import { TUser } from "@/model/UserSchema";
+import { TPost } from "@/model/PostSchema";
+import { TComment } from "@/model/CommentSchema";
 
 const CommentBox = styled.div`
   border-bottom: 3px solid blue;
@@ -23,10 +26,19 @@ const CommentBox = styled.div`
   }
 `;
 
-const PostPage = ({ post, isAuthor }: { post: TPost; isAuthor: boolean }) => {
+const PostPage = ({
+  post,
+  isAuthor,
+  user,
+}: {
+  post: TPost;
+  isAuthor: boolean;
+  user: UserToken;
+}) => {
   const router = useRouter();
   const [isModal, setIsModal] = React.useState(false);
   const [likes, setLikes] = React.useState(post.meta.likes);
+
   const handlePostDelete = async () => {
     const response = await fetch(`/api/post/delete`, {
       method: "POST",
@@ -41,14 +53,6 @@ const PostPage = ({ post, isAuthor }: { post: TPost; isAuthor: boolean }) => {
   };
 
   const handlePostRecommend = async () => {
-    //유저당 한번만 할 수 있어야 함.
-    // 내가 생각한 방법은. post에 저장?  아니면 user에 저장?
-    // user에 저장시 -> anonymous에도 쿠키형태로 저장.
-    // post에 저장시. userId를 저장한다. 그리고 나서 post에서 userId를 찾아서.  없으면.
-    // 추천 하나 올리고. 근데 userId가 없으면???????????????
-    // 즉 문제는 익명도 어떻게 하느냐인건ㄱ데.
-    // 유동은 1일 1회 추천. 고닉은 1일 무제한. but 한글에는 하나만.
-
     const response = await fetch(getfullUrl("api/post/recommend"), {
       method: "POST",
       body: JSON.stringify({ postId: post._id }),
@@ -102,12 +106,18 @@ const PostPage = ({ post, isAuthor }: { post: TPost; isAuthor: boolean }) => {
           )}
         </Stack>
         <div className="mt-20">
-          <CommentBox>
-            <CommentItem nestedItem={["df"]}></CommentItem>
-          </CommentBox>
+          {post.comments.length > 0 && (
+            <CommentBox>
+              {post.comments.map((comment) => {
+                if (!comment) return;
+                return <CommentItem comment={comment as TComment} />;
+              })}
+            </CommentBox>
+          )}
+
           <CommentBox>
             <ListItemLayout>
-              <WriteComment></WriteComment>
+              <WriteComment postId={post._id} userId={user.id}></WriteComment>
             </ListItemLayout>
           </CommentBox>
         </div>
@@ -121,14 +131,6 @@ const PostPage = ({ post, isAuthor }: { post: TPost; isAuthor: boolean }) => {
           }}
         ></Modal>
       )}
-      <style jsx>{`
-        h1 {
-          font-size: 2rem;
-        }
-        .controller {
-          margin-top: 1rem;
-        }
-      `}</style>
     </div>
   );
 };
@@ -150,20 +152,34 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       { new: true }
     )
       .populate("author")
+      .populate({
+        path: "comments",
+        populate: {
+          path: "author",
+          model: "User",
+          select: "username",
+        },
+      })
       .exec();
+
     const user = await getDataFromCookie<UserToken>(
       context.req,
       context.res,
       "user"
     );
 
+    if (!user) throw Error("postid page : no user");
+
     return {
       props: {
         post: JSON.parse(JSON.stringify(post)),
+        user: JSON.parse(JSON.stringify(user)),
         isAuthor: post.author._id.toString() === user?.id,
       },
     };
-  } catch {
+  } catch (error: any) {
+    console.log(error);
+
     return {
       redirect: {
         permanent: false,

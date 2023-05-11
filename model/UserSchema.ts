@@ -1,11 +1,19 @@
-import mongoose, { Schema, Types } from "mongoose";
+import mongoose, {
+  Document,
+  ObjectId,
+  PopulatedDoc,
+  Schema,
+  Types,
+} from "mongoose";
 import bcrypt from "bcrypt";
 import Village from "./VillageSchema";
+import { TComment } from "./CommentSchema";
 
 export interface TUser {
   username: string;
   villageId: Types.ObjectId;
   password: string;
+  comments: PopulatedDoc<Document<ObjectId> & TComment>;
 }
 
 const userSchema = new Schema({
@@ -13,6 +21,7 @@ const userSchema = new Schema({
   villageId: Schema.Types.ObjectId,
   password: String,
   posts: [{ type: Schema.Types.ObjectId, ref: "Post" }],
+  comments: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
 });
 
 userSchema.pre("save", async function (next) {

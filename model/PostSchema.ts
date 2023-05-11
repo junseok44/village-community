@@ -1,15 +1,18 @@
-import mongoose, { Schema, ObjectId } from "mongoose";
+import mongoose, { Schema, ObjectId, Document, PopulatedDoc } from "mongoose";
 import Village from "./VillageSchema";
-import User from "./UserSchema";
+import User, { TUser } from "./UserSchema";
+import { TComment } from "./CommentSchema";
 
-export interface TPost {
-  postNumber: number;
+export interface TPost extends Document<ObjectId> {
+  _id: ObjectId;
+  postNumber?: number;
   title: string;
-  author: Schema.Types.ObjectId;
+  author: PopulatedDoc<TUser & Document<ObjectId>>;
   body: string;
   writeAt: Date;
   category: string;
   villageId: string;
+  comments: PopulatedDoc<TComment & Document<ObjectId>>[];
   meta: {
     view: number;
     likes: number;
@@ -23,6 +26,7 @@ const postSchema = new Schema({
   body: String,
   writeAt: Date,
   category: String,
+  comments: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
   villageId: { type: Schema.Types.ObjectId, ref: "Village" },
   meta: {
     view: Number,
@@ -32,6 +36,8 @@ const postSchema = new Schema({
 
 postSchema.pre("save", async function (next) {
   try {
+    this.postNumber = (await Village.countDocuments()) + 1;
+
     const village = await Village.findByIdAndUpdate(this.villageId, {
       $addToSet: {
         posts: this._id,
@@ -55,29 +61,32 @@ postSchema.pre("save", async function (next) {
   }
 });
 
-postSchema.pre("findOneAndDelete", { query: true }, async function (next) {
-  console.log("removing post from users and village");
+postSchema.pre(
+  "findOneAndDelete",
+  { query: true, document: true },
+  async function (next) {
+    console.log("removing post from users and village");
+    try {
+      const document = await this.model.findOne(this.getQuery());
+      const village = await Village.findByIdAndUpdate(
+        document.villageId,
+        { $pull: { posts: document._id } },
+        { new: true }
+      );
+      if (!village) throw new Error("Village not found");
 
-  try {
-    // const removedPost = await this.findOne();
-    // const village = await Village.findByIdAndUpdate(
-    //   removedPost.villageId,
-    //   { $pull: { posts: removedPost._id } },
-    //   { new: true }
-    // );
-    // if (!village) throw new Error("Village not found");
+      const user = await User.findByIdAndUpdate(document.author, {
+        $pull: { posts: document._id },
+      });
+      if (!user) throw new Error("User not found");
 
-    // const user = await User.findByIdAndUpdate(removedPost.author, {
-    //   $pull: { posts: removedPost._id },
-    // });
-    // if (!user) throw new Error("User not found");
-
-    // next();
-    next();
-  } catch (error: any) {
-    console.log(error.message);
-    next(error);
+      next();
+      next();
+    } catch (error: any) {
+      console.log(error.message);
+      next(error);
+    }
   }
-});
+);
 
 export default mongoose.models.Post || mongoose.model("Post", postSchema);
