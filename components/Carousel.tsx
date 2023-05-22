@@ -61,8 +61,6 @@ const Carousel = ({ items, windowSize }: CarouselProps) => {
 
   useLayoutEffect(() => {
     if (!isAutoplay && itemWidth > 0) {
-      console.log(isAutoplay, itemWidth);
-
       handleAutoPlay();
       isAutoplay = true;
     }
@@ -153,9 +151,7 @@ const Carousel = ({ items, windowSize }: CarouselProps) => {
         </S.SlideWrapper>
         <S.NextArrow onClick={handleNextArrow}>next</S.NextArrow>
       </S.SlideContainer>
-      <div>{index}</div>
-      {/* <button onClick={handleAutoPlay}>autoplay</button> */}
-      {/* <button onClick={stopAutoPlay}>stopAutoplay</button> */}
+      {/* <div>{index}</div> */}
     </>
   );
 };

@@ -2,9 +2,9 @@ import React from "react";
 import styled from "@emotion/styled";
 import { Button, Stack, TextField } from "@mui/material";
 import { getfullUrl } from "@/lib/getfullUrl";
-import { useRouter } from "next/router";
-import { ObjectId } from "mongoose";
-
+import { ObjectId, Schema } from "mongoose";
+import { TCommentMock } from "@/pages/post/[postId]";
+import { v4 } from "uuid";
 const LoginForm = styled.div`
   width: 20%;
   div:not(:last-child) {
@@ -18,22 +18,21 @@ const WriteBody = styled.div`
   height: 100%;
 `;
 
-// 만약에 nickname과 code가 있으면?
-//
-
 const WriteComment = ({
   userId,
+  userName,
   postId,
+  setList,
 }: {
-  userId: string;
+  userId: Schema.Types.ObjectId;
+  userName: string;
   postId: ObjectId;
+  setList: React.Dispatch<React.SetStateAction<TCommentMock[]>>;
 }) => {
-  const router = useRouter();
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const { comment } = e.currentTarget;
     if (!userId || !comment || !postId) return alert("입력해주세요");
-    console.log(comment?.value, postId, userId);
 
     const response = await fetch(getfullUrl("api/comment/create"), {
       method: "POST",
@@ -45,8 +44,16 @@ const WriteComment = ({
       }),
     });
     if (response.status === 200) {
-      // router.reload();
-      alert("성공");
+      const body = await response.json();
+      setList((prev) => [
+        ...prev,
+        {
+          id: body.id,
+          author: userName,
+          createdAt: new Date(),
+          text: comment.value,
+        },
+      ]);
     } else {
       alert("실패했습니다.");
     }

@@ -1,7 +1,7 @@
 import mongoose, { Schema, ObjectId, Document, PopulatedDoc } from "mongoose";
 import Village from "./VillageSchema";
 import User, { TUser } from "./UserSchema";
-import { TComment } from "./CommentSchema";
+import Comment, { TComment } from "./CommentSchema";
 
 export interface TPost extends Document<ObjectId> {
   _id: ObjectId;
@@ -67,7 +67,12 @@ postSchema.pre(
   async function (next) {
     console.log("removing post from users and village");
     try {
-      const document = await this.model.findOne(this.getQuery());
+      const document: TPost | null = await this.model
+        .findOne(this.getQuery())
+        .populate("comments")
+        .exec();
+      if (!document) throw new Error("no document");
+
       const village = await Village.findByIdAndUpdate(
         document.villageId,
         { $pull: { posts: document._id } },
@@ -80,7 +85,22 @@ postSchema.pre(
       });
       if (!user) throw new Error("User not found");
 
-      next();
+      await Promise.all(
+        document.comments.map(async (item) => {
+          // FIXME 이게 지금 안되고 있는 상황임.
+          if (item && "author" in item) {
+            await User.findByIdAndUpdate(item.author?._id, {
+              $pull: {
+                comments: item._id,
+              },
+            });
+          }
+
+          await Comment.findOneAndDelete({ _id: item?._id });
+        })
+      );
+      console.log("deleted all");
+
       next();
     } catch (error: any) {
       console.log(error.message);

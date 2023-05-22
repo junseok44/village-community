@@ -42,8 +42,8 @@ const Home = ({ posts, user, village, totalPost }: HomeProps) => {
         <Stack rowGap={3}>
           <div className="villageName">{village.villageName}</div>
           <div className="villageInfo">
-            villageInfo
             <Button>이사가기</Button>
+            <Button>새로운 마을 만들기</Button>
           </div>
           <div>
             <div className="controller flex justify-between items-center">

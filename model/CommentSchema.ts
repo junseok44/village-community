@@ -1,18 +1,18 @@
 import mongoose, { Document, ObjectId, PopulatedDoc, Schema } from "mongoose";
 import { TUser } from "./UserSchema";
 import User from "./UserSchema";
-import Post from "./PostSchema";
+import Post, { TPost } from "./PostSchema";
 
 export interface TComment {
   author: PopulatedDoc<Document<ObjectId> & TUser>;
-  parentPost: string;
+  parentPost: PopulatedDoc<Document<ObjectId> & TPost>;
   childComment: PopulatedDoc<Document<ObjectId> & TComment>[];
   text: string;
   createdAt: Date;
   updatedAt?: Date;
 }
 
-const CommentSchema = new mongoose.Schema({
+const CommentSchema = new mongoose.Schema<TComment>({
   author: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   parentPost: {
     type: mongoose.Schema.Types.ObjectId,
@@ -44,23 +44,20 @@ CommentSchema.pre("save", async function (next) {
 });
 
 CommentSchema.pre(
-  "remove",
-  { query: false, document: true },
+  "findOneAndDelete",
+  { query: true, document: true },
   async function (next) {
     console.log("try deleting comment from post and user");
-
     try {
-      // const doc = await this.model.findOne(this.getQuery());
-
-      await User.findByIdAndUpdate(this.author, {
+      const doc = await this.model.findOne(this.getQuery());
+      await User.findByIdAndUpdate(doc.author, {
         $pull: {
-          comments: this._id,
+          comments: doc._id,
         },
       });
-
-      await Post.findByIdAndUpdate(this.parentPost, {
+      await Post.findByIdAndUpdate(doc.parentPost, {
         $pull: {
-          comments: this._id,
+          comments: doc._id,
         },
       });
     } catch (error: any) {

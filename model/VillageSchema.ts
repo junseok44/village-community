@@ -6,6 +6,7 @@ export interface TVillage {
   _id: string;
   villageName: string;
   category: string[];
+  description: string;
   admin: Types.ObjectId;
   posts: Types.ObjectId[];
   users: Types.ObjectId[];
@@ -13,6 +14,7 @@ export interface TVillage {
 
 const VillageSchema = new mongoose.Schema<TVillage>({
   villageName: String,
+  description: String,
   category: [{ type: String }],
   admin: { type: Schema.Types.ObjectId, ref: "User" },
   posts: [{ type: Schema.Types.ObjectId, ref: "Post" }],

@@ -3,13 +3,14 @@ import { NextApiRequest, NextApiResponse } from "next";
 import Iron from "@hapi/iron";
 import User from "../../model/UserSchema";
 import { setCookie } from "@/lib/auth-cookies";
+import { Schema } from "mongoose";
 
 export const localTokenPassword =
   "123456356456425723457457247DSFASFASDFA245724724724";
 
 export interface UserToken {
   username: string;
-  id: string;
+  id: Schema.Types.ObjectId;
   villageId: string;
 }
 

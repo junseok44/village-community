@@ -15,9 +15,7 @@ import PostBody from "@/components/shared/PostBody";
 import styled from "@emotion/styled";
 import CommentItem, { ListItemLayout } from "@/components/comment/comment_item";
 import WriteComment from "@/components/comment/comment_write";
-import { TUser } from "@/model/UserSchema";
 import { TPost } from "@/model/PostSchema";
-import { TComment } from "@/model/CommentSchema";
 
 const CommentBox = styled.div`
   border-bottom: 3px solid blue;
@@ -25,6 +23,13 @@ const CommentBox = styled.div`
     border-top: 3px solid blue;
   }
 `;
+
+export type TCommentMock = {
+  id: string;
+  author: string;
+  text: string;
+  createdAt: Date;
+};
 
 const PostPage = ({
   post,
@@ -38,6 +43,30 @@ const PostPage = ({
   const router = useRouter();
   const [isModal, setIsModal] = React.useState(false);
   const [likes, setLikes] = React.useState(post.meta.likes);
+  const [commentList, setCommentList] = React.useState<TCommentMock[]>(
+    post.comments.map((comment) => {
+      if (
+        comment &&
+        "author" in comment &&
+        comment.author &&
+        "username" in comment.author
+      ) {
+        return {
+          id: comment._id,
+          author: comment.author.username,
+          createdAt: comment.createdAt,
+          text: comment.text,
+        };
+      } else {
+        return {
+          id: comment?.id,
+          author: "yep",
+          createdAt: new Date(),
+          text: "dfdf",
+        };
+      }
+    })
+  );
 
   const handlePostDelete = async () => {
     const response = await fetch(`/api/post/delete`, {
@@ -66,13 +95,24 @@ const PostPage = ({
       setLikes(likes + 1);
     }
   };
+
+  const handleDeleteComment = async (id: string) => {
+    const response = await fetch(getfullUrl("api/comment/delete"), {
+      method: "POST",
+      body: JSON.stringify({
+        id,
+      }),
+    });
+    if (response.status == 200) {
+      setCommentList(commentList.filter((comment) => comment.id != id));
+    }
+  };
   return (
     <div className="pt-16 max-w-6xl mx-auto">
       <Stack gap="1rem">
         <Typography variant="h4">{post.title}</Typography>
         <Divider></Divider>
         <PostBody html={post.body}></PostBody>
-
         <Stack direction="row" justifyContent={"space-between"} gap={2}>
           <Stack direction="row" gap={"0.5rem"} alignItems="center">
             <ThumbUpAltRoundedIcon></ThumbUpAltRoundedIcon>
@@ -108,16 +148,26 @@ const PostPage = ({
         <div className="mt-20">
           {post.comments.length > 0 && (
             <CommentBox>
-              {post.comments.map((comment) => {
+              {commentList.map((comment) => {
                 if (!comment) return;
-                return <CommentItem comment={comment as TComment} />;
+                return (
+                  <CommentItem
+                    key={comment.id}
+                    comment={comment}
+                    onDelete={handleDeleteComment}
+                  />
+                );
               })}
             </CommentBox>
           )}
-
           <CommentBox>
             <ListItemLayout>
-              <WriteComment postId={post._id} userId={user.id}></WriteComment>
+              <WriteComment
+                postId={post._id}
+                userId={user.id}
+                userName={user.username}
+                setList={setCommentList}
+              ></WriteComment>
             </ListItemLayout>
           </CommentBox>
         </div>

@@ -4,6 +4,8 @@ import { TUser } from "@/model/UserSchema";
 import CommentBody from "./comment_item_body";
 import { TComment } from "@/model/CommentSchema";
 import { formatDate } from "@/lib/formatDate";
+import { TCommentMock } from "@/pages/post/[postId]";
+import { getfullUrl } from "@/lib/getfullUrl";
 
 export const ListItemLayout = styled.div`
   padding: 1rem 0.3rem;
@@ -18,23 +20,25 @@ const PaddingLeft = styled.div`
   padding-left: 2rem;
 `;
 
-const CommentItem = ({ comment }: { comment: TComment }) => {
-  const isNested = comment.childComment.length > 0;
+const CommentItem = ({
+  comment,
+  onDelete,
+}: {
+  comment: TCommentMock;
+  onDelete: (id: string) => void;
+}) => {
+  // const isNested = comment.childComment.length > 0;
   const [isWriting, setIsWriting] = useState(false);
-  console.log(comment.author);
 
   return (
     <ListItemLayout>
       <CommentBody
-        author={(comment.author as TUser)?.username}
+        author={comment.author}
         body={comment.text}
         date={formatDate(comment.createdAt)}
         onClick={() => setIsWriting(!isWriting)}
-        onDelete={() => {}}
+        onDelete={() => onDelete(comment.id)}
       ></CommentBody>
-      {/* <PaddingLeft>
-
-      </PaddingLeft> */}
     </ListItemLayout>
   );
 };

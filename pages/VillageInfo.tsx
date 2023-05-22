@@ -24,7 +24,7 @@ const VillageInfo = ({ villages }: VillageInfoProps) => {
               <VillageInfoCard
                 key={village._id}
                 title={village.villageName}
-                description="dfd"
+                description={village.description || "설명이 없습니다."}
               ></VillageInfoCard>
             ))}
             windowSize={4}

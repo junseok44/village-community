@@ -19,7 +19,7 @@ const CommentBody = ({
       <div className="flex-1">{body}</div>
       <div className="">{date}</div>
       <div
-        className="pl-4 text-red-600"
+        className="pl-4 text-red-600 cursor-pointer"
         onClick={(e) => {
           e.stopPropagation();
           onDelete();

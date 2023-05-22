@@ -20,7 +20,7 @@ export default async function handler(
 
       newComment.save();
 
-      res.status(200).json({ message: "saved" });
+      res.status(200).json({ id: newComment._id });
     } else {
       res.status(400).json({ message: "Invalid request method" });
     }

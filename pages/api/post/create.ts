@@ -3,6 +3,7 @@ import Post from "../../../model/PostSchema";
 import { getDataFromCookie } from "@/lib/auth-cookies";
 import sanitizeHTML from "sanitize-html";
 import { UserToken } from "../Login";
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse

@@ -17,8 +17,6 @@ export default async function handler(
       return res.status(404).json({ message: "Post not found" });
     }
 
-    // Delete the post
-
     // Return a success message
     res.status(200).json({ message: "Post deleted successfully" });
   } catch (error) {
