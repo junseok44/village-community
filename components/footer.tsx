@@ -5,25 +5,25 @@ const Footer = () => {
     <footer>
       <ul>
         <li>
-          <a>회사소개</a>
+          <a>안녕하세요</a>
         </li>
         <li>
-          <a>제휴안내</a>
+          <a>이것은 footer입니다</a>
         </li>
         <li>
-          <a>광고안내</a>
+          <a>뭘 쓸지</a>
         </li>
         <li>
-          <a>이용약관</a>
+          <a>생각이 안났어요</a>
         </li>
         <li>
-          <a>청소년보호정책 </a>
+          <a>으아ㅏ</a>
         </li>
         <li>
-          <a>운영원칙</a>
+          <a>귀찮아</a>
         </li>
       </ul>
-      <span>Copyright ⓒ 2000 - 2013 junseokInside. All rights reserved.</span>
+      <span>Copyright ⓒ 2000 - 2013 junseok's site. All rights reserved.</span>
       <style jsx>{`
         footer {
           position: absolute;

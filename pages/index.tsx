@@ -1,4 +1,5 @@
 import PostListHeader from "@/components/postlist_header";
+
 import PostList_Item from "@/components/postlist_item";
 import { Button } from "@mui/material";
 import dbConnect from "@/lib/db";
@@ -10,8 +11,9 @@ import Village, { TVillage } from "../model/VillageSchema";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { getDataFromCookie } from "@/lib/auth-cookies";
-import { Stack } from "@mui/material";
+import { Stack, Divider } from "@mui/material";
 import { TUser } from "@/model/UserSchema";
+import Modal from "@/components/shared/Modal";
 
 interface HomeProps {
   user: UserToken | null;
@@ -28,7 +30,6 @@ const Home = ({ posts, user, village, totalPost }: HomeProps) => {
       query: { category: categoryName },
     });
   };
-
   const handleChangePage = (page: number) => {
     router.push({
       pathname: router.pathname,
@@ -36,15 +37,32 @@ const Home = ({ posts, user, village, totalPost }: HomeProps) => {
     });
   };
 
+  const [isMoveClicked, setIsMoveClicked] = React.useState(false);
+
+  const confirmTownMove = () => {};
   return (
     <>
+      {isMoveClicked && (
+        <Modal
+          message="정말 이사가시겠나요? 다시 돌아올 수 없어요"
+          onConfirm={() => setIsMoveClicked(false)}
+          onCancel={() => setIsMoveClicked(false)}
+        ></Modal>
+      )}
       <div className="Home">
         <Stack rowGap={3}>
-          <div className="villageName">{village.villageName}</div>
-          <div className="villageInfo">
-            <Button>이사가기</Button>
-            <Button>새로운 마을 만들기</Button>
-          </div>
+          <Stack
+            direction={"row"}
+            justifyContent={"space-between"}
+            alignItems={"flex-end"}
+          >
+            <div className="villageName">{village.villageName}</div>
+            <div>
+              <Button onClick={() => setIsMoveClicked(true)}>이사가기</Button>
+              <Button>새로운 마을 만들기</Button>
+            </div>
+          </Stack>
+          <Divider sx={{ borderBottom: "0.5px solid black" }}></Divider>
           <div>
             <div className="controller flex justify-between items-center">
               <ul className="category flex">
@@ -101,6 +119,7 @@ const Home = ({ posts, user, village, totalPost }: HomeProps) => {
 
         <style jsx>{`
           .Home {
+            margin-top: 1rem;
             .villageName {
               font-size: 3rem;
             }

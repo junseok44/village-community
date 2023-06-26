@@ -1,4 +1,3 @@
-// lib/db/dbConnect.ts
 import mongoose from "mongoose";
 import "../model/UserSchema";
 import "../model/CommentSchema";
@@ -36,24 +35,3 @@ async function dbConnect() {
 }
 
 export default dbConnect;
-
-// import { MongoClient } from "mongodb";
-
-// const uri = `mongodb://localhost:27017/${process.env.DBNAME}`;
-// const client = new MongoClient(uri, {});
-
-// export async function connectToDatabase() {
-//   try {
-//     await client.connect();
-//     console.log("Connected to MongoDB!");
-//   } catch (err) {
-//     console.log("Unable to connect to MongoDB:", err);
-//   }
-// }
-
-// export default async function handler(req, res) {
-//   const database = client.db("mydb");
-//   const collection = database.collection("mycollection");
-//   const result = await collection.find({}).toArray();
-//   res.json(result);
-// }
